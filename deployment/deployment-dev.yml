@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-application-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-application
+  template:
+    metadata:
+      labels:
+        app: library-application
+    spec:
+      containers:
+      - name: library-application
+        image: <your-docker-username>/library-application:latest
+        ports:
+        - containerPort: 8080
