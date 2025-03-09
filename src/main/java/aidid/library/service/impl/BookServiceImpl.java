@@ -2,6 +2,7 @@ package aidid.library.service.impl;
 
 import aidid.library.model.Book;
 import aidid.library.repo.BookRepository;
+import aidid.library.repo.BorrowerRepository;
 import aidid.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,14 @@ public class BookServiceImpl implements BookService {
         if (bookOptional.isPresent()) {
             Book book = bookOptional.get();
             if (book.getBorrowerId() == null) {
-                book.setBorrowerId(borrowerId);
-                bookRepository.save(book);
+                // Check if the borrower is already borrowing another book
+                List<Book> borrowedBooks = bookRepository.findByBorrowerId(borrowerId);
+                if (borrowedBooks.isEmpty()) {
+                    book.setBorrowerId(borrowerId);
+                    bookRepository.save(book);
+                } else {
+                    throw new IllegalStateException("Borrower is already borrowing another book");
+                }
             } else {
                 throw new IllegalStateException("Book is already borrowed");
             }
